@@ -1,0 +1,164 @@
+"""
+Codigo APENDICE A
+"""
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Signature import pss
+from Crypto.Hash import SHA256
+
+def crear_RSAKey():
+    key = RSA.generate(2048)
+
+    return key
+
+def guardar_RSAKey_Privada(fichero, key, password):
+    key_cifrada = key.export_key(passphrase=password, pkcs=8, protection="scryptAndAES128-CBC")
+    file_out = open(fichero, "wb")
+    file_out.write(key_cifrada)
+    file_out.close()
+
+def cargar_RSAKey_Privada(fichero, password):
+    key_cifrada = open(fichero, "rb").read()
+    key = RSA.import_key(key_cifrada, passphrase=password)
+
+    return key
+
+def guardar_RSAKey_Publica(fichero, key):
+    key_pub = key.publickey().export_key()
+    file_out = open(fichero, "wb")
+    file_out.write(key_pub)
+    file_out.close()
+
+def cargar_RSAKey_Publica(fichero):
+    keyFile = open(fichero, "rb").read()
+    key_pub = RSA.import_key(keyFile)
+
+    return key_pub
+
+def cifrarRSA_OAEP(cadena, key):
+    datos = cadena.encode("utf-8")
+    engineRSACifrado = PKCS1_OAEP.new(key)
+    cifrado = engineRSACifrado.encrypt(datos)
+
+    return cifrado
+
+def descifrarRSA_OAEP(cifrado, key):
+    engineRSADescifrado = PKCS1_OAEP.new(key)
+    datos = engineRSADescifrado.decrypt(cifrado)
+    cadena = datos.decode("utf-8")
+
+    return cadena
+
+def firmarRSA_PSS(texto, key_private):
+    h = SHA256.new(texto.encode("utf-8")) # Ya veremos los hash la semana que viene
+    print(h.hexdigest())
+    signature = pss.new(key_private).sign(h)
+
+    return signature
+
+def comprobarRSA_PSS(texto, firma, key_public):
+    h = SHA256.new(texto.encode("utf-8")) # Ya veremos los hash la semana que viene
+    print(h.hexdigest())
+    verifier = pss.new(key_public)
+    try:
+        verifier.verify(h, firma)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+"""
+Codigo APENDICE B
+"""
+from Crypto.PublicKey import ECC
+from Crypto.Hash import SHA256
+from Crypto.Signature import DSS
+
+# Ver https://pycryptodome.readthedocs.io/en/latest/src/public_key/ecc.html
+# Ver https://pycryptodome.readthedocs.io/en/latest/src/signature/dsa.html
+
+def crear_ECCKey():
+    # Use 'NIST P-256'
+    return key
+
+def guardar_ECCKey_Privada(fichero, key, password):
+    # ...
+
+def cargar_ECCKey_Privada(fichero, password):
+    # ...
+    return key
+
+def guardar_ECCKey_Publica(fichero, key):
+    # ...
+
+def cargar_ECCKey_Publica(fichero):
+# ...
+return key_pub
+
+# def cifrarECC_OAEP(cadena, key):
+# El cifrado con ECC (ECIES) aun no está implementado
+# Por lo tanto, no se puede implementar este método aun en la versión 3.9.0
+    return cifrado
+
+# def descifrarECC_OAEP(cifrado, key):
+# El cifrado con ECC (ECIES) aun no está implementado
+    # Por lo tanto, no se puede implementar este método aun en la versión 3.9.0
+    return cadena
+
+def firmarECC_PSS(texto, key_private):
+    # ...
+    return signature
+
+def comprobarECC_PSS(texto, firma, key_public):
+    # ...
+    try:
+        # ...
+        return True
+    except (ValueError, TypeError):
+        return False
+
+"""
+Codigo APENDICE C
+"""
+
+class RSA_OBJECT:
+
+    def __init__(self):
+        """Inicializa un objeto RSA, sin ninguna clave"""
+        # Nota: Para comprobar si un objeto (no) ha sido inicializado, hay
+        #   que hacer "if self.public_key is None:"
+
+    def create_KeyPair(self):
+        """Crea un par de claves publico/privada, y las almacena dentro de la instancia"""
+
+    def save_PrivateKey(self, file, password):
+        """Guarda la clave privada self.private_key en un fichero file, usando una contraseña
+password"""
+
+    def load_PrivateKey(self, file, password):
+        """Carga la clave privada self.private_key de un fichero file, usando una contraseña
+password"""
+
+    def save_PublicKey(self, file):
+        """Guarda la clave publica self.public_key en un fichero file"""
+
+    def load_PublicKey(self, file):
+        """Carga la clave publica self.public_key de un fichero file"""
+
+    def cifrar(self, datos):
+        """Cifra el parámetro datos (de tipo binario) con la clave self.public_key, y devuelve
+           el resultado. En caso de error, se devuelve None"""
+
+    def descifrar(self, cifrado):
+        """Descrifra el parámetro cifrado (de tipo binario) con la clave self.private_key, y
+Devuelve el resultado (de tipo binario). En caso de error, se devuelve None"""
+
+    def firmar(self, datos):
+        """Firma el parámetro datos (de tipo binario) con la clave self.private_key, y devuelve
+el resultado. En caso de error, se devuelve None."""
+
+    def comprobar(self, text, signature):
+        """Comprueba el parámetro text (de tipo binario) con respecto a una firma signature
+           (de tipo binario), usando para ello la clave self.public_key.
+           Devuelve True si la comprobacion es correcta, o False en caso contrario o
+           en caso de error."""
+
